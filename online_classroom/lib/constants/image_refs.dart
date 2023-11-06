@@ -1,0 +1,10 @@
+const String homeIcon = 'asset/images/home_icon.svg';
+const String lateTaskIcon = 'asset/images/late_task.svg';
+const String completedTaskIcon = 'asset/images/task_completed.svg';
+const String createTaskIcon = 'asset/images/createTaskIcon.svg';
+const String gradesIcon = 'asset/images/grades.svg';
+const String taskIcon = 'asset/images/task_icon.svg';
+const String successIcon = 'asset/images/success_icon.svg';
+const String errorDeleteIcon = 'asset/images/delet.svg';
+const String createIcon = 'asset/images/create-student.png';
+const String authIcon = 'asset/images/auth.png';

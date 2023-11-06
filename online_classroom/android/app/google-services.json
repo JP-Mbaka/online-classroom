@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "665891302896",
+    "firebase_url": "https://online-classroom-3085e-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "online-classroom-3085e",
+    "storage_bucket": "online-classroom-3085e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665891302896:android:c497b06d888a6221e60135",
+        "android_client_info": {
+          "package_name": "com.example.online_classroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665891302896-hujst2le50lddceqtat7th6vr0vgj2ak.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJy4RNgamWcJkNYzfJB9rwjQDREaME_hY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665891302896-hujst2le50lddceqtat7th6vr0vgj2ak.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "665891302896-nbuufs4a07ab9kfl0h000ffr97nqniro.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.onlineClassroom"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
