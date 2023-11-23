@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:online_classroom/constants/dimensions.dart';
 import 'package:online_classroom/constants/image_refs.dart';
 import 'package:online_classroom/auth/logging.dart';
+import 'package:online_classroom/model/school/school_model.dart';
 import 'package:online_classroom/provider/userProvider.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -16,6 +18,13 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _form2Key = GlobalKey<FormState>();
+
+  final _form3eKey = GlobalKey<FormState>();
+
+  final _adminSchoolController = TextEditingController();
+  final _adminSchoolCodeController = TextEditingController();
+
+  final _adminIDController = TextEditingController();
 
   final _fnameController = TextEditingController();
   final _lnameController = TextEditingController();
@@ -30,8 +39,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
   //Passord Controlls
 
-  bool showPass = false;
-  bool showConPass = false;
+  bool showPass = true;
+  bool showConPass = true;
+
+  bool isNAdmin = true;
 
   _showPass() {
     setState(() {
@@ -79,6 +90,9 @@ class _SignupScreenState extends State<SignupScreen> {
     _userTypeController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _adminSchoolCodeController.dispose();
+    _adminSchoolController.dispose();
+    _adminIDController.dispose();
     super.dispose();
   }
 
@@ -225,6 +239,10 @@ class _SignupScreenState extends State<SignupScreen> {
                         setState(() {
                           userTypeValue = val;
                           _userIdController.text = generateuserID(val);
+                          if (val == "Admin") {
+                            isNAdmin = false;
+                            showMore();
+                          }
                         });
                       },
                     ),
@@ -240,6 +258,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(height: height(context) * 0.02),
                     TextFormField(
                       controller: _schoolController,
+                      enabled: isNAdmin,
                       decoration: const InputDecoration(
                           label: Text("School Name"),
                           prefixIcon: Icon(Icons.school),
@@ -248,10 +267,35 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(height: height(context) * 0.02),
                     TextFormField(
                       controller: _schoolIdController,
+                      enabled: isNAdmin,
                       decoration: const InputDecoration(
                           label: Text("School Code"),
                           prefixIcon: Icon(Icons.school_outlined),
                           border: OutlineInputBorder()),
+                    ),
+                    SizedBox(height: height(context) * 0.02),
+                    TextFormField(
+                      controller: _userIdController,
+                      decoration: const InputDecoration(
+                          label: Text("Admin ID"),
+                          prefixIcon: Icon(Icons.person_4),
+                          border: OutlineInputBorder()),
+                      onEditingComplete: () async {
+                        final db = FirebaseDatabase.instance.ref();
+                        final snapshot = await db
+                            .child("users/schools/${_adminIDController.text}")
+                            .get();
+
+                        if (snapshot.exists) {
+                          print(snapshot.value);
+                          final ar =
+                              schoolInfoFromJson(snapshot.value.toString());
+                          print(ar.school);
+                          print(ar.schoolId);
+                        } else {
+                          print("No data available");
+                        }
+                      },
                     ),
                     SizedBox(height: height(context) * 0.05),
                     ElevatedButton(
@@ -303,31 +347,30 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    _form2Key.currentState!.save();
+    _form2Key.currentState?.save();
+
+    _form3eKey.currentState?.save();
     try {
-      onCreateUserInfo(
+      onCreateAccount(
         email: _emailController.text,
+        pass: _passwordController.text,
+        isLogin: false,
         fname: _fnameController.text,
         lname: _lnameController.text,
         othername: _othernameController.text,
         school: _schoolController.text,
         schoolId: _schoolIdController.text,
         userId: _userIdController.text,
-        userType: _userTypeController.text,
+        userType: userTypeValue,
+        adminID: _adminIDController.text,
       );
-
-      onCreateAccount(
-        email: _emailController.text,
-        pass: _passwordController.text,
-        isLogin: false,
-      );
-
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("User account is created successfully"),
         ),
       );
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => LoginScreen(),
@@ -341,5 +384,125 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     }
+  }
+
+  showMore() {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isDismissible: false,
+        builder: (_) => SingleChildScrollView(
+              child: Container(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    IconButton.filled(
+                      style: IconButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.onBackground,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.background),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        size: 28,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.onBackground,
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(15),
+                          topLeft: Radius.circular(15),
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0)
+                          .copyWith(top: 16.0),
+                      child: Column(
+                        children: [
+                          Form(
+                            key: _form3eKey,
+                            child: Column(
+                              children: [
+                                TextFormField(
+                                  controller: _adminSchoolController,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.trim().isEmpty ||
+                                        value.trim().length < 3) {
+                                      return "Must contain Characters";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  decoration: const InputDecoration(
+                                      label: Text("School Name"),
+                                      border: OutlineInputBorder()),
+                                ),
+                                SizedBox(height: height(context) * 0.02),
+                                TextFormField(
+                                  controller: _adminSchoolCodeController,
+                                  validator: (value) {
+                                    if (value == null ||
+                                        value.trim().isEmpty ||
+                                        value.trim().length < 3) {
+                                      return "Must contain Characters";
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                  decoration: const InputDecoration(
+                                      label: Text("School Code"),
+                                      border: OutlineInputBorder()),
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        var isValid =
+                                            _form3eKey.currentState?.validate();
+                                        if (isValid == false) {
+                                          return;
+                                        }
+                                        _schoolController.text =
+                                            _adminSchoolController.text;
+                                        _schoolIdController.text =
+                                            _adminSchoolCodeController.text;
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text("Save")),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Text(
+                            "Subjects",
+                            textAlign: TextAlign.left,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                              ),
+                              child: ListView(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: height(context) * 0.05),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ));
   }
 }

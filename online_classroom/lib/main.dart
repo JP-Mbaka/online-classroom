@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:online_classroom/Dashboad/main_dashboard.dart';
 import 'package:online_classroom/auth/logging.dart';
 import 'package:online_classroom/firebase_options.dart';
 import 'package:online_classroom/widget/test.dart';
@@ -17,6 +18,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const ProviderScope(child: MyApp()));
+  // runApp(MaterialApp(
+  //   home: MainDashboardScreen(),
+  // ));
 }
 
 class MyApp extends StatelessWidget {
@@ -30,11 +34,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
-        useMaterial3: true,
+        // useMaterial3: true,
       ),
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
-        useMaterial3: true,
+        // useMaterial3: true,
       ),
       home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
@@ -46,8 +50,8 @@ class MyApp extends StatelessWidget {
                 big: Theme.of(context).textTheme.headlineLarge,
               ));
             }
-            if(snapshot.hasData){
-              
+            if (snapshot.hasData) {
+              return MainDashboardScreen();
             }
             return LoginScreen();
           }),

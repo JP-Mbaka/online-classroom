@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 UserModel userModelFromJson(String str) => UserModel.fromJson(json.decode(str));
 
+
 enum UserType { student, teacher, admin }
 
-class UserModel with ChangeNotifier {
+class UserModel {
   String email;
   String fName;
   String lName;
@@ -14,7 +15,8 @@ class UserModel with ChangeNotifier {
   String school;
   String schoolId;
   String userId;
-  UserType userType;
+  String userType;
+  String? adminID;
 
   UserModel({
     required this.email,
@@ -25,6 +27,7 @@ class UserModel with ChangeNotifier {
     required this.schoolId,
     required this.userId,
     required this.userType,
+    this.adminID,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -36,16 +39,18 @@ class UserModel with ChangeNotifier {
         schoolId: json["schoolId"],
         userId: json["userId"],
         userType: json["userType"],
+        adminID: json["adminID"],
       );
 
   Map<String, dynamic> toJson() => {
         "email": email,
-        "fName": email,
-        "lName": email,
-        "otherName": email,
-        "school": email,
-        "schoolId": email,
-        "userId": email,
-        "userType": email,
+        "fName": fName,
+        "lName": lName,
+        "otherName": otherName,
+        "school": school,
+        "schoolId": schoolId,
+        "userId": userId,
+        "userType": userType,
+        "adminID": adminID,
       };
 }
