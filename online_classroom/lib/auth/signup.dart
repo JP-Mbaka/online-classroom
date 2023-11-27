@@ -7,7 +7,7 @@ import 'package:online_classroom/constants/dimensions.dart';
 import 'package:online_classroom/constants/image_refs.dart';
 import 'package:online_classroom/auth/logging.dart';
 import 'package:online_classroom/model/school/school_model.dart';
-import 'package:online_classroom/provider/userProvider.dart';
+import 'package:online_classroom/provider/authProvider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -394,6 +394,8 @@ class _SignupScreenState extends State<SignupScreen> {
         builder: (_) => SingleChildScrollView(
               child: Container(
                 color: Colors.transparent,
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: Column(
                   children: [
                     IconButton.filled(
@@ -413,7 +415,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.background,
                         borderRadius: const BorderRadius.only(
                           topRight: Radius.circular(15),
                           topLeft: Radius.circular(15),

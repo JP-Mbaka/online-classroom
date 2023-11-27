@@ -4,7 +4,7 @@ import 'package:online_classroom/auth/signup.dart';
 import 'package:online_classroom/constants/dimensions.dart';
 import 'package:online_classroom/constants/image_refs.dart';
 import 'package:online_classroom/main.dart';
-import 'package:online_classroom/provider/userProvider.dart';
+import 'package:online_classroom/provider/authProvider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 UserModel userModelFromJson(String str) => UserModel.fromJson(json.decode(str));
 
 

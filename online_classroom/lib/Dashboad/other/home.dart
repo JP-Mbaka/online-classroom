@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     List<Widget> screens = [
-      DashboardScreen(),
+      const DashboardScreen(),
       // ClassRoomScreen(),
       TaskScreen(),
       const GradesScreen(),
