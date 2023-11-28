@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:online_classroom/auth/logging.dart';
 import 'package:online_classroom/constants/dimensions.dart';
+import 'package:online_classroom/model/user/userModel.dart';
 import 'package:online_classroom/provider/subject/subject_provider.dart';
 import 'package:online_classroom/provider/userProvider.dart';
 import 'package:online_classroom/screens/lesson/create_lesson.dart';
@@ -22,8 +26,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   dynamic createRes = 0;
 
   List<DropdownMenuItem> resourceList = [
-    const DropdownMenuItem(value: 0, 
-      child: Text("Select"),),
+    const DropdownMenuItem(
+      value: 0,
+      child: Text("Select"),
+    ),
     const DropdownMenuItem(
       value: "Subject",
       child: Text("Create Subject"),
@@ -45,23 +51,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref.read(subjectProvider.notifier).loadAllMySubjects(userInfo);
 
     //perfect
-    String? teacher;
-    // List<SubjectsModel> lessons = [];
-    List lessons = [];
+    UserModel? teacher;
     final mySubject = ref.watch(subjectProvider);
-    // List mySubject = [];
-    // final allSubject = ref.watch(subjectListProvider);
-    List allSubject = [];
-
-    for (var items in mySubject) {
-      for (var t in allSubject) {
-        if (items.subjectCode == t.subjectCode) {
-          lessons.add(t);
-        }
-      }
-    }
-    // final teachers = ref.watch(teachersProvider);
-    List teachers = [];
 
     return Scaffold(
       appBar: AppBar(
@@ -72,43 +63,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         title: const Text('Classroom'),
         actions: [
           // if (userInfo.userType == "Teacher")
-            SizedBox(
-              width: width(context) * 0.3,
-              child: DropdownButtonFormField(
-                value: createRes,
-                items: resourceList,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.add),
-                  isCollapsed: true,
-                  disabledBorder: InputBorder.none,
-                ),
-                onChanged: (val) {
-                  setState(() {
-                    createRes = val;
-                    if (val == "Subject") {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => CreateSubjectScreen()));
-                    } else if (val == "Lesson") {
-                      //Load the subject first then push the subject
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => CreateLessonScreen()));
-                    } else {}
-                  });
-                },
+          SizedBox(
+            width: width(context) * 0.3,
+            child: DropdownButtonFormField(
+              value: createRes,
+              items: resourceList,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.add),
+                isCollapsed: true,
+                disabledBorder: InputBorder.none,
               ),
+              onChanged: (val) {
+                setState(() {
+                  createRes = val;
+                  if (val == "Subject") {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => CreateSubjectScreen()));
+                  } else if (val == "Lesson") {
+                    //Load the subject first then push the subject
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => CreateLessonScreen()));
+                  } else {}
+                });
+              },
             ),
-          // IconButton(
-          //   onPressed: () {
-          //     if (userInfo.userType == "teacher") {
-          //       //Lets have a drop down here
-          //
-          //     }
-          //   },
-          //   icon: userInfo.userType == "Student" && userInfo.userType != "Admin"
-          //       ? const Icon(Icons.notifications)
-          //       : const Icon(Icons.add),
-          // ),
+          ),
           IconButton(
             onPressed: () {
               FirebaseAuth.instance.signOut();
@@ -122,24 +102,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       body: SafeArea(
           child: Column(
         children: [
-          if (lessons.isNotEmpty)
+          if (mySubject.isEmpty)
             Expanded(
               child: ListView.builder(
                   shrinkWrap: true,
                   padding: const EdgeInsets.symmetric(horizontal: 8)
                       .copyWith(bottom: 4),
-                  itemCount: lessons.length,
+                  itemCount: mySubject.isNotEmpty ? mySubject.length : 1,
                   itemBuilder: ((context, index) {
-                    if (lessons.isEmpty) {
-                      return test('No lessons available');
+                    if (mySubject.isEmpty) {
+                      return Column(
+                        children: [
+                          SizedBox(height: height(context) * 0.35),
+                          test('No lessons available'),
+                        ],
+                      );
                     }
-                    for (var t in teachers) {
-                      if (lessons[index].userId == t.userId) {
-                        teacher = '${t.fName} ${t.lName}';
-                      }
-                    }
+                    //we get teachers details
+                    DatabaseReference starCountRef = FirebaseDatabase.instance
+                        .ref('users/${mySubject[index].userId}');
+                    starCountRef.onValue.listen((DatabaseEvent event) {
+                      final data = event.snapshot.value;
+                      teacher = userModelFromJson(json.encode(data).toString());
+                    });
                     return DisplayTask(
-                        lesson: lessons[index],
                         author: teacher,
                         isLesson: true,
                         onNewScreen: () {

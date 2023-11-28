@@ -1,50 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:online_classroom/constants/dimensions.dart';
 import 'package:online_classroom/model/subject/subject_model.dart';
 import 'package:online_classroom/model/task/task_mode.dart';
+import 'package:online_classroom/model/user/userModel.dart';
+import 'package:online_classroom/provider/subject/subject_provider.dart';
 
 // ignore: must_be_immutable
-class DisplayTask extends StatelessWidget {
+class DisplayTask extends ConsumerWidget {
   DisplayTask(
       {super.key,
-      this.lesson,
+      this.mySubject,
       this.author,
       this.onNewScreen,
       this.task,
       this.isLesson = false});
 
-  SubjectModel? lesson;
-  String? author;
+  SubjectModel? mySubject;
+  UserModel? author;
   TaskModel? task;
 
   void Function()? onNewScreen;
   bool isLesson;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final mySubject = ref.watch(subjectProvider);
+
     Expanded content;
     if (isLesson == true) {
       content = Expanded(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(lesson!.subjectTitle),
+            Text(mySubject!.subjectTitle),
             Row(
               children: [
-                Text(lesson!.level),
+                Text(mySubject!.level),
                 const SizedBox(width: 8),
-                Text(lesson!.department),
+                Text(mySubject!.department),
                 const Spacer(),
               ],
             ),
             const Spacer(),
-            Text(author ?? ""),
+            Text("${author?.lName} ${author?.fName}"),
           ],
         ),
       );
     } else {
-      content = Expanded(
+      content = const Expanded(
           child: Center(
         child: Text('Testing'),
       ));
